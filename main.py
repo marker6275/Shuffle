@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 import time
 import json
+import argparse
 
 load_dotenv()
 
@@ -12,13 +13,20 @@ SONGS = {}
 SONGS_TO_ADD = []
 CURRENT_SONG = None
 
-with open('tunes.json', 'r') as f:
-    TUNES = json.load(f)
+def load_tunes():
+    with open('tunes.json', 'r') as f:
+        return json.load(f)
+
+def write_to_tunes(tunes):
+    with open('tunes.json', 'w') as f:
+        json.dump(tunes, f, indent=2)
 
 def get_songs_from_tunes(sp):
     global SONGS
     offset = 0
     limit = 100  # max 100 per request
+
+    print(f"Getting songs...")
     
     while True:
         tracks_response = sp.playlist_tracks(PLAYLIST_ID, offset=offset, limit=limit)['items']
@@ -48,7 +56,7 @@ def get_songs_from_tunes(sp):
     
     print("Saved songs to tunes.json")
 
-def poll_current_playing(sp):
+def poll_current_playing(sp, tunes):
     global CURRENT_SONG
 
     skipped = False
@@ -66,21 +74,19 @@ def poll_current_playing(sp):
             song_status = 'PLAYING'
 
         if song_status in ('PLAYING', 'PAUSED'):
-            song = TUNES.get(id, None)
+            song = tunes.get(id, None)
             if song:
                 if id != CURRENT_SONG:
                     print("NEW SONG!")
                     song['strikes'] += 1
                     skipped = False
                     CURRENT_SONG = id
-                    with open('tunes.json', 'w') as f:
-                        json.dump(TUNES, f, indent=2)
+                    write_to_tunes(tunes)
 
                 if progress_ms >= 20 and not skipped:
                     song['strikes'] -= 1
                     skipped = True
-                    with open('tunes.json', 'w') as f:
-                        json.dump(TUNES, f, indent=2)
+                    write_to_tunes(tunes)
             else:
                 print(f"❌ '{name}' by {artists} is NOT in your TUNES playlist")
             
@@ -119,17 +125,23 @@ def print_current_playing(sp):
     return is_playing, id, name, artists, uri, progress_ms, duration_ms
 
 def main():
+    parser = argparse.ArgumentParser(description='Spotify Playlist Cleaner')
+    parser.add_argument('--get', action='store_true', help='Fetch songs from playlist')
+    args = parser.parse_args()
+
     scope = "user-top-read user-read-playback-state playlist-read-private playlist-read-collaborative"
 
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
-    
+
     user = sp.current_user()
     print(f"Logged in as: {user['display_name']}")
     print("-" * 50)
 
-    # get_songs_from_tunes(sp)
+    tunes = load_tunes()
+    if args.get:
+        get_songs_from_tunes(sp, tunes)
 
-    poll_current_playing(sp)
+    poll_current_playing(sp, tunes)
 
 if __name__ == "__main__":
     main()
