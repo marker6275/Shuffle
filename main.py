@@ -50,8 +50,8 @@ def get_songs_from_tunes(sp):
 
 def poll_current_playing(sp):
     global CURRENT_SONG
-    skipped = False
 
+    skipped = False
     while True:
         is_playing, id, name, artists, uri, progress_ms, duration_ms = print_current_playing(sp)
         song_status = 'NOT_PLAYING'
@@ -69,16 +69,18 @@ def poll_current_playing(sp):
             song = TUNES.get(id, None)
             if song:
                 if id != CURRENT_SONG:
+                    print("NEW SONG!")
                     song['strikes'] += 1
+                    skipped = False
                     CURRENT_SONG = id
                     with open('tunes.json', 'w') as f:
                         json.dump(TUNES, f, indent=2)
 
-                if not skipped and progress_ms >= 20:
+                if progress_ms >= 20 and not skipped:
                     song['strikes'] -= 1
+                    skipped = True
                     with open('tunes.json', 'w') as f:
                         json.dump(TUNES, f, indent=2)
-                    skipped = True
             else:
                 print(f"❌ '{name}' by {artists} is NOT in your TUNES playlist")
             
