@@ -2,5 +2,6 @@
 .cache
 
 .venv/
+__pycache__/
 
 tunes.json
