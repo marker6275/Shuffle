@@ -10,7 +10,7 @@ load_dotenv()
 
 PLAYLIST_ID = os.getenv('PLAYLIST_ID')
 SONGS = {}
-SONGS_TO_ADD = []
+SONGS_TO_ADD = {}
 CURRENT_SONG = None
 
 def load_tunes():
@@ -56,40 +56,61 @@ def get_songs_from_tunes(sp):
     
     print("Saved songs to tunes.json")
 
+def add_song(id, name, artists, uri):
+    global SONGS_TO_ADD, CURRENT_SONG
+
+    print("Song not in playlist")
+    CURRENT_SONG = id
+
+    SONGS_TO_ADD[id] = {
+        'name': name,
+        'artist': artists,
+        'uri': uri,
+        'strikes': 0
+    }
+
+def add_strike(song, tunes, id):
+    global CURRENT_SONG
+    song['strikes'] += 1
+    CURRENT_SONG = id
+    write_to_tunes(tunes)
+
+def remove_strike(song, tunes):
+    song['strikes'] -= 1
+    write_to_tunes(tunes)
+
+def update_strikes(id, song, tunes, progress_ms, skipped):
+    global CURRENT_SONG
+    if id != CURRENT_SONG:
+        add_strike(song, tunes, id)
+        return True
+
+    if progress_ms >= 20 and skipped:
+        remove_strike(song, tunes)
+        return False
+
+    return skipped
+
 def poll_current_playing(sp, tunes):
     global CURRENT_SONG
 
-    skipped = False
+    skipped = True
     while True:
-        is_playing, id, name, artists, uri, progress_ms, duration_ms = print_current_playing(sp)
+        is_playing, id, name, artists, uri, progress_ms = print_current_playing(sp)
         song_status = 'NOT_PLAYING'
 
         if is_playing == 0x00:
             song_status = 'NOT_PLAYING'
             time.sleep(10)
             continue
-        elif is_playing == 0x10:
-            song_status = 'PAUSED'
-        elif is_playing == 0x11:
-            song_status = 'PLAYING'
-
-        if song_status in ('PLAYING', 'PAUSED'):
+        elif is_playing == 0x10 or is_playing == 0x11:
+            song_status = 'PLAYING' if is_playing == 0x11 else 'PAUSED'
             song = tunes.get(id, None)
             if song:
-                if id != CURRENT_SONG:
-                    print("NEW SONG!")
-                    song['strikes'] += 1
-                    skipped = False
-                    CURRENT_SONG = id
-                    write_to_tunes(tunes)
-
-                if progress_ms >= 20 and not skipped:
-                    song['strikes'] -= 1
-                    skipped = True
-                    write_to_tunes(tunes)
+                skipped = update_strikes(id, song, tunes, progress_ms, skipped)
             else:
-                print(f"❌ '{name}' by {artists} is NOT in your TUNES playlist")
-            
+                add_song(id, name, artists, uri)
+                
         print(f"Song Status: {song_status}")
         print()
 
