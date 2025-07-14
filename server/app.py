@@ -2,6 +2,12 @@ from flask import Flask, request, jsonify
 from main import get_current_playing
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+REDIRECT_URL = os.getenv('REDIRECT_URL')
 
 app = Flask(__name__)
 
@@ -13,7 +19,7 @@ def index():
 
 @app.route('/current_playing')
 def current_playing():
-    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
+    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope, redirect_uri=REDIRECT_URL))
     user = sp.current_user()
 
     playback = get_current_playing(sp, verbose=True)

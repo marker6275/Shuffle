@@ -9,6 +9,7 @@ import argparse
 load_dotenv()
 
 PLAYLIST_ID = os.getenv('PLAYLIST_ID')
+
 SONGS = {}
 SONGS_TO_ADD = {}
 CURRENT_SONG = None
