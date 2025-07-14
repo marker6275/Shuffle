@@ -17,6 +17,7 @@ def current_playing():
     user = sp.current_user()
 
     playback = get_current_playing(sp, verbose=True)
+    print(playback)
     return jsonify({
         'user': user,
         'message': playback['item'] if playback else None
