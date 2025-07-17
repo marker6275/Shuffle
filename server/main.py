@@ -117,6 +117,52 @@ def poll_current_playing(sp, tunes, display=False):
 
         time.sleep(5)
 
+SKIPPED = True
+SONG_STATUS = 'NOT_PLAYING'
+def update_current_playing(playback):
+    global SKIPPED, CURRENT_SONG
+
+    tunes = load_tunes()
+    is_playing, id, name, artists, uri, progress, duration = parse_playing(playback)
+    song_status = 'NOT_PLAYING'
+
+    if is_playing == 0x00:
+        return 'NOT_PLAYING'
+    elif is_playing == 0x10 or is_playing == 0x11:
+        song_status = 'PLAYING' if is_playing == 0x11 else 'PAUSED'
+        song = tunes.get(id, None)
+        if song:
+            SKIPPED = update_strikes(id, song, tunes, progress, SKIPPED)
+        else:
+            add_song(id, name, artists, uri)
+
+    return song_status
+
+def get_current_playing(sp, display=False, verbose=False):
+    # 0x00: NOT_PLAYING
+    # 0x10: PAUSED
+    # 0x11: PLAYING
+
+    playback = sp.current_playback()
+
+    if verbose:
+        playback_verbose = handle_verbose(playback)
+        
+        song_status = update_current_playing(playback_verbose)
+        return playback_verbose, song_status
+
+    if playback and playback['item']:
+        is_playing, id, name, artists, uri, progress, duration = parse_playing(playback)
+
+        if display:
+            print_song(id, name, artists, uri, progress, duration)
+    else:
+        print("No track is currently playing.\n")
+
+        return 0x00, None, None, None, None, None, None
+
+    return is_playing, id, name, artists, uri, progress, duration
+
 def parse_playing(playback):
 
     if not playback:
@@ -144,29 +190,6 @@ def print_song(id, name, artists, uri, progress, duration):
     print(f"ID: {id} ")
     print(f"Progress: {progress} / {duration} ")
     print(f"URI: {uri}")
-
-def get_current_playing(sp, display=False, verbose=False):
-    # 0x00: NOT_PLAYING
-    # 0x10: PAUSED
-    # 0x11: PLAYING
-
-    playback = sp.current_playback()
-
-    if verbose:
-        playback_verbose = handle_verbose(playback)
-        return playback_verbose
-
-    if playback and playback['item']:
-        is_playing, id, name, artists, uri, progress, duration = parse_playing(playback)
-
-        if display:
-            print_song(id, name, artists, uri, progress, duration)
-    else:
-        print("No track is currently playing.\n")
-
-        return 0x00, None, None, None, None, None, None
-
-    return is_playing, id, name, artists, uri, progress, duration
 
 def main():
     parser = argparse.ArgumentParser(description='Spotify Playlist Cleaner')

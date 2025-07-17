@@ -23,9 +23,10 @@ def index():
 
 @app.route('/current_playing')
 def current_playing():
-    playback = get_current_playing(sp, verbose=True)
+    playback, song_status = get_current_playing(sp, verbose=True)
     return jsonify({
-        'message': playback['item'] if playback else None
+        'message': playback['item'] if playback else None,
+        'playing_status': song_status
         })
 
 @app.route('/login')
