@@ -4,10 +4,6 @@ import { useEffect, useState } from "react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
-function convertToList(songs: any) {
-
-}
-
 export default function Skipped() {
   const [skippedSongs, setSkippedSongs] = useState<{ [key: string]: { name: string, artist: string, uri: string, strikes: number } }>({});
 
