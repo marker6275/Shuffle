@@ -10,8 +10,8 @@ export default function Navbar() {
 
   const tabs = [
     { name: 'Currently Playing', href: '/dashboard' },
-    { name: 'Skipped Songs', href: '/recommended' },
-    { name: 'Recommended Songs', href: '/skipped' },
+    { name: 'Skipped Songs', href: '/skipped' },
+    { name: 'Recommended Songs', href: '/recommended' },
   ];
 
   return (

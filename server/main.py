@@ -11,8 +11,11 @@ load_dotenv()
 PLAYLIST_ID = os.getenv('PLAYLIST_ID')
 
 SONGS = {}
+SKIPPED_SONGS = {}
 SONGS_TO_ADD = {}
 CURRENT_SONG = None
+SKIPPED = True
+SONG_STATUS = 'NOT_PLAYING'
 
 def load_tunes():
     with open('tunes.json', 'r') as f:
@@ -80,14 +83,39 @@ def remove_strike(song, tunes):
     song['strikes'] -= 1
     write_to_tunes(tunes)
 
+def validate_skipped_songs(songs):
+    tunes = load_tunes()
+
+    for song in songs:
+        if song not in tunes or tunes[song]['strikes'] <= 0:
+            del songs[song]
+        
+    return songs
+
+def get_skipped_songs():
+    global SKIPPED_SONGS
+    
+    songs = validate_skipped_songs(SKIPPED_SONGS)
+    return songs
+
 def update_strikes(id, song, tunes, progress, skipped):
-    global CURRENT_SONG
-    if id != CURRENT_SONG:
+    global CURRENT_SONG, SKIPPED_SONGS
+
+    if id != CURRENT_SONG and progress < 20:
         add_strike(song, tunes, id)
+        if id not in SKIPPED_SONGS and progress < 20:
+            SKIPPED_SONGS[id] = {
+                'name': song['name'],
+                'artist': song['artist'],
+                'uri': song['uri'],
+                'strikes': song['strikes']
+            }
         return True
 
-    if progress > 20 and skipped:
+    if progress >= 20 and skipped:
         remove_strike(song, tunes)
+        if id in SKIPPED_SONGS:
+            del SKIPPED_SONGS[id]
         return False
 
     return skipped
@@ -117,13 +145,11 @@ def poll_current_playing(sp, tunes, display=False):
 
         time.sleep(5)
 
-SKIPPED = True
-SONG_STATUS = 'NOT_PLAYING'
 def update_current_playing(playback):
     global SKIPPED, CURRENT_SONG
 
     tunes = load_tunes()
-    is_playing, id, name, artists, uri, progress, duration = parse_playing(playback)
+    is_playing, id, name, artists, uri, progress, _ = parse_playing(playback)
     song_status = 'NOT_PLAYING'
 
     if is_playing == 0x00:

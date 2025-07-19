@@ -1,6 +1,6 @@
 from flask import Flask, redirect, jsonify, request, session
 from flask_cors import CORS
-from main import get_current_playing
+from main import get_current_playing, get_skipped_songs
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from dotenv import load_dotenv
@@ -14,6 +14,7 @@ app = Flask(__name__)
 CORS(app, origins=['http://localhost:3000', 'http://127.0.0.1:3000'])
 
 scope = "user-top-read user-read-playback-state playlist-read-private playlist-read-collaborative"
+
 auth_manager = SpotifyOAuth(scope=scope, redirect_uri=REDIRECT_URL)
 sp = spotipy.Spotify(auth_manager=auth_manager)
 
@@ -28,6 +29,12 @@ def current_playing():
         'message': playback['item'] if playback else None,
         'playing_status': song_status
         })
+
+@app.route('/skipped_songs')
+def skipped_songs():
+    skipped_songs = get_skipped_songs()
+
+    return jsonify({'message': skipped_songs})
 
 @app.route('/login')
 def login():
