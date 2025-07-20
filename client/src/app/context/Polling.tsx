@@ -32,29 +32,21 @@ export function NowPlayingProvider({children}: {children: any}) {
     const [currentPlaying, setCurrentPlaying] = useState({name: "", artists: "", image: "", status: playingStatus.NOT_PLAYING});
 
     useEffect(() => {
-        fetch(API_BASE + '/current_playing')
-        .then(res => res.json())
-        .then(data => {
-            setSong(data, setCurrentPlaying);
-        });
+        const fetchNowPlaying = () => {
+          fetch(API_BASE + '/current_playing')
+          .then(res => res.json())
+          .then(data => {
+              setSong(data, setCurrentPlaying);
+          });
+        }
 
-        const playingInterval = setInterval(() => {
-            fetch(API_BASE + '/current_playing')
-            .then(res => res.json())
-            .then(data => {
-              setSong(data, setCurrentPlaying)
-            });
-          }, 5000);
+        fetchNowPlaying();
+
+        const playingInterval = setInterval(fetchNowPlaying, 5000);
       
-          const notPlayingInterval = setInterval(() => {
-            fetch(API_BASE + '/current_playing')
-            .then(res => res.json())
-            .then(data => {
-              setSong(data, setCurrentPlaying)
-            });
-          }, 10000);
+        const notPlayingInterval = setInterval(fetchNowPlaying, 10000);
       
-          return () => {currentPlaying.status === playingStatus.NOT_PLAYING ? clearInterval(notPlayingInterval) : clearInterval(playingInterval)};
+        return () => {currentPlaying.status === playingStatus.NOT_PLAYING ? clearInterval(notPlayingInterval) : clearInterval(playingInterval)};
       }, []);
 
       return (

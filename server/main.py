@@ -80,17 +80,17 @@ def add_strike(song, tunes, id):
     write_to_tunes(tunes)
 
 def remove_strike(song, tunes):
-    song['strikes'] -= 1
+    song['strikes'] = max(0, song['strikes'] - 1)
     write_to_tunes(tunes)
 
-def validate_skipped_songs(songs):
+def validate_skipped_songs(skipped_songs):
     tunes = load_tunes()
 
-    for song in songs:
+    for song in list(skipped_songs.keys()):
         if song not in tunes or tunes[song]['strikes'] <= 0:
-            del songs[song]
+            del skipped_songs[song]
         
-    return songs
+    return skipped_songs
 
 def get_skipped_songs():
     global SKIPPED_SONGS
@@ -98,7 +98,7 @@ def get_skipped_songs():
     songs = validate_skipped_songs(SKIPPED_SONGS)
     return songs
 
-def update_strikes(id, song, tunes, progress, skipped):
+def update_strikes(id, song, tunes, progress, skipped, image):
     global CURRENT_SONG, SKIPPED_SONGS
 
     if id != CURRENT_SONG and progress < 20:
@@ -108,7 +108,8 @@ def update_strikes(id, song, tunes, progress, skipped):
                 'name': song['name'],
                 'artist': song['artist'],
                 'uri': song['uri'],
-                'strikes': song['strikes']
+                'strikes': song['strikes'],
+                'image': image
             }
         return True
 
@@ -125,7 +126,7 @@ def poll_current_playing(sp, tunes, display=False):
 
     skipped = True
     while True:
-        is_playing, id, name, artists, uri, progress, _ = get_current_playing(sp, display)
+        is_playing, id, name, artists, uri, progress, _, image = get_current_playing(sp, display)
         song_status = 'NOT_PLAYING'
 
         if is_playing == 0x00:
@@ -136,7 +137,7 @@ def poll_current_playing(sp, tunes, display=False):
             song_status = 'PLAYING' if is_playing == 0x11 else 'PAUSED'
             song = tunes.get(id, None)
             if song:
-                skipped = update_strikes(id, song, tunes, progress, skipped)
+                skipped = update_strikes(id, song, tunes, progress, skipped, image)
             else:
                 add_song(id, name, artists, uri)
         
@@ -149,7 +150,7 @@ def update_current_playing(playback):
     global SKIPPED, CURRENT_SONG
 
     tunes = load_tunes()
-    is_playing, id, name, artists, uri, progress, _ = parse_playing(playback)
+    is_playing, id, name, artists, uri, progress, _, image = parse_playing(playback)
     song_status = 'NOT_PLAYING'
 
     if is_playing == 0x00:
@@ -158,7 +159,7 @@ def update_current_playing(playback):
         song_status = 'PLAYING' if is_playing == 0x11 else 'PAUSED'
         song = tunes.get(id, None)
         if song:
-            SKIPPED = update_strikes(id, song, tunes, progress, SKIPPED)
+            SKIPPED = update_strikes(id, song, tunes, progress, SKIPPED, image)
         else:
             add_song(id, name, artists, uri)
 
@@ -178,23 +179,24 @@ def get_current_playing(sp, display=False, verbose=False):
         return playback_verbose, song_status
 
     if playback and playback['item']:
-        is_playing, id, name, artists, uri, progress, duration = parse_playing(playback)
+        is_playing, id, name, artists, uri, progress, duration, image = parse_playing(playback)
 
         if display:
             print_song(id, name, artists, uri, progress, duration)
     else:
         print("No track is currently playing.\n")
 
-        return 0x00, None, None, None, None, None, None
+        return 0x00, None, None, None, None, None, None, None
 
-    return is_playing, id, name, artists, uri, progress, duration
+    return is_playing, id, name, artists, uri, progress, duration, image
 
 def parse_playing(playback):
 
     if not playback:
-         return 0x00, None, None, None, None, None, None
+         return 0x00, None, None, None, None, None, None, None
 
     track = playback['item']
+
     name = track['name']
     id = track['id']
     progress = playback['progress_ms'] // 1000 if playback['progress_ms'] else 0
@@ -202,8 +204,9 @@ def parse_playing(playback):
     uri = track['uri']
     artists = ', '.join([artist['name'] for artist in track['artists']])
     is_playing = 0x11 if playback['is_playing'] else 0x10
+    image = track['album']['images'][1]['url']
 
-    return is_playing, id, name, artists, uri, progress, duration
+    return is_playing, id, name, artists, uri, progress, duration, image
 
 def handle_verbose(playback):
     if not playback:
