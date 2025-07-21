@@ -17,6 +17,8 @@ CURRENT_SONG = None
 SKIPPED = True
 SONG_STATUS = 'NOT_PLAYING'
 
+REDIRECT_URL = os.getenv('REDIRECT_URI')
+
 def load_tunes():
     with open('tunes.json', 'r') as f:
         return json.load(f)
@@ -40,7 +42,8 @@ def get_songs_from_tunes(sp):
                 'name': track['track']['name'], 
                 'artist': track['track']['artists'][0]['name'], 
                 'uri': track['track']['uri'], 
-                'strikes': 0
+                'strikes': 0,
+                'image': track['track']['album']['images'][1]['url']
                 }
             for track in tracks_response
             if track['track'] is not None
@@ -228,7 +231,7 @@ def main():
 
     scope = "user-top-read user-read-playback-state playlist-read-private playlist-read-collaborative"
 
-    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
+    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope, redirect_uri=REDIRECT_URL))
 
     user = sp.current_user()
     print(f"Logged in as: {user['display_name']}")
@@ -236,7 +239,7 @@ def main():
 
     tunes = load_tunes()
     if args.get:
-        get_songs_from_tunes(sp, tunes)
+        get_songs_from_tunes(sp)
 
     poll_current_playing(sp, tunes, args.print)
 

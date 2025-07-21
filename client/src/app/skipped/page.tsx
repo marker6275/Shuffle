@@ -26,9 +26,13 @@ export default function Skipped() {
 
   return (
     <div className="flex flex-col items-center justify-center p-8 gap-4">
-      {Object.entries(skippedSongs).map(([key, value]) => (
+      {Object.entries(skippedSongs).length > 0 ? (
+        Object.entries(skippedSongs).map(([key, value]) => (
           <SkippedCard key={key} song={value}/>
-      ))}
+        ))
+      ) : (
+        <h1 className="text-2xl font-bold">No songs skipped</h1>
+      )}
     </div>
   );
 }
