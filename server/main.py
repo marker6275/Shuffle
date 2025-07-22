@@ -136,7 +136,7 @@ def update_strikes(id, song, tunes, progress, skipped, image):
 
     if progress >= 20 and skipped:
         remove_strike(song, tunes)
-        if id in SKIPPED_SONGS:
+        if id in SKIPPED_SONGS and song['strikes'] <= 0:
             del SKIPPED_SONGS[id]
         return False
 

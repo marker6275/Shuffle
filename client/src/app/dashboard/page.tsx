@@ -23,9 +23,12 @@ export default function Dashboard() {
   return (
     <main className='flex items-center justify-center py-12'>
       <div className='flex flex-col items-center bg-green-400 rounded-lg p-6 transition-all duration-300 max-w-84 md:max-w-96'>
-        <h1 className="text-3xl font-bold flex justify-center items-center pb-2">Currently Playing</h1>
-        <p className='text-sm mb-4'><span className="underline">Username</span>: {user}</p>
-        <p className='font-semibold mb-4'>{currentPlaying.status}</p>
+        <h1 className="text-3xl font-bold flex justify-center items-center mb-2">Currently Playing</h1>
+        <hr className='w-full mb-2'/>
+        <div className="flex w-full justify-between">
+          <p className='text-sm mb-2'><span className="underline">Username</span>: {user}</p>
+          <p className='font-semibold mb-2'>{currentPlaying.status}</p>
+        </div>
         {currentPlaying.name !== "" && (
           <div className="w-full flex flex-col items-center">
             <img src={currentPlaying.image} alt="Album Art" className='w-full h-full'/>
