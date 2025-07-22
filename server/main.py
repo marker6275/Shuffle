@@ -23,9 +23,9 @@ def load_tunes():
     with open('tunes.json', 'r') as f:
         return json.load(f)
 
-def write_to_tunes(tunes):
+def write_to_tunes(data):
     with open('tunes.json', 'w') as f:
-        json.dump(tunes, f, indent=2)
+        json.dump(data, f, indent=2)
 
 def get_songs_from_tunes(sp):
     global SONGS
@@ -58,8 +58,7 @@ def get_songs_from_tunes(sp):
 
     print(f"Length of SONGS: {len(SONGS)}")
     
-    with open('tunes.json', 'w') as f:
-        json.dump(SONGS, f, indent=2)
+    write_to_tunes(SONGS)
     
     print("Saved songs to tunes.json")
 

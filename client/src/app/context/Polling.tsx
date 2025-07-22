@@ -11,6 +11,7 @@ const playingStatus: { [key: string]: string } = {
 }
 
 const NowPlayingContext = createContext({
+    id: "",
     name: "",
     artists: "",
     image: "",
@@ -21,15 +22,15 @@ function setSong(data: any, setCurrentPlaying: any) {
     if (data.message) {
       const song = data.message
       const status = data.playing_status
-      setCurrentPlaying({name: song.name, artists: song.artists[0].name, image: song.album.images[1].url, status: playingStatus[status]})
+      setCurrentPlaying({id: song.id, name: song.name, artists: song.artists[0].name, image: song.album.images[1].url, status: playingStatus[status]})
     } else { 
       const status = data.playing_status
-      setCurrentPlaying({name: "", artists: "", image: "", status: playingStatus[status]})
+      setCurrentPlaying({id: "", name: "", artists: "", image: "", status: playingStatus[status]})
     }
 }
 
 export function NowPlayingProvider({children}: {children: any}) {
-    const [currentPlaying, setCurrentPlaying] = useState({name: "", artists: "", image: "", status: playingStatus.NOT_PLAYING});
+    const [currentPlaying, setCurrentPlaying] = useState({id: "", name: "", artists: "", image: "", status: playingStatus.NOT_PLAYING});
 
     useEffect(() => {
         const fetchNowPlaying = () => {
