@@ -11,7 +11,7 @@ load_dotenv()
 REDIRECT_URL = os.getenv('REDIRECT_URI')
 
 app = Flask(__name__)
-CORS(app, origins=['http://localhost:3000', 'http://127.0.0.1:3000'])
+CORS(app, origins=['http://localhost:3000', 'http://192.168.1.152:3000'])
 
 scope = "user-top-read user-read-playback-state playlist-read-private playlist-read-collaborative"
 
@@ -53,7 +53,7 @@ def callback():
 
     user = sp.current_user()
 
-    return redirect(f"http://localhost:3000/dashboard?user={user['display_name']}")
+    return redirect(f"http://192.168.1.152:3000/dashboard?user={user['display_name']}")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
