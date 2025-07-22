@@ -22,15 +22,15 @@ export default function Dashboard() {
 
   return (
     <main className='flex items-center justify-center py-12'>
-      <div className='flex flex-col items-center bg-green-400 rounded-lg p-6 transition-all duration-300'>
+      <div className='flex flex-col items-center bg-green-400 rounded-lg p-6 transition-all duration-300 max-w-84 md:max-w-96'>
         <h1 className="text-3xl font-bold flex justify-center items-center pb-2">Currently Playing</h1>
         <p className='text-sm mb-4'><span className="underline">Username</span>: {user}</p>
         <p className='font-semibold mb-4'>{currentPlaying.status}</p>
         {currentPlaying.name !== "" && (
-          <div className="w-full">
+          <div className="w-full flex flex-col items-center">
             <img src={currentPlaying.image} alt="Album Art" className='w-full h-full'/>
-            <p className='text-xl font-bold'>{currentPlaying.name}</p>
-            <p className='text-sm'>By: <span className='font-bold'>{currentPlaying.artists}</span></p>
+            <p className='text-xl font-bold text-left w-full'>{currentPlaying.name}</p>
+            <p className='text-sm text-left w-full'>By: <span className='font-bold'>{currentPlaying.artists}</span></p>
           </div>
         )}
         {currentPlaying.name === "" && (
