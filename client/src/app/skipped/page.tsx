@@ -9,6 +9,14 @@ export default function Skipped() {
   const [skippedSongs, setSkippedSongs] = useState<{ [key: string]: { name: string, artist: string, uri: string, strikes: number, image: string } }>({});
 
   useEffect(() => {
+    fetch(API_BASE + '/refresh_skipped')
+      .then(res => res.json())
+      .then(data => {
+        if (data.message != 1) {
+          console.log(data.message)
+        }
+      });
+
     const fetchSkippedSongs = () => {
       fetch(API_BASE + '/skipped_songs')
         .then(res => res.json())

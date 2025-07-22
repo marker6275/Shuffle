@@ -101,6 +101,24 @@ def get_skipped_songs():
     songs = validate_skipped_songs(SKIPPED_SONGS)
     return songs
 
+def refresh_skipped_songs():
+    tunes = load_tunes()
+
+    try:
+        for id, song in tunes.items():
+            if song['strikes'] > 0:
+                SKIPPED_SONGS[id] = {
+                    'name': song['name'],
+                    'artist': song['artist'],
+                    'uri': song['uri'],
+                    'strikes': song['strikes'],
+                    'image': song['image']
+                }
+
+        return 1
+    except Exception as e:
+        return e
+
 def update_strikes(id, song, tunes, progress, skipped, image):
     global CURRENT_SONG, SKIPPED_SONGS
 

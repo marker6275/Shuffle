@@ -1,6 +1,6 @@
 from flask import Flask, redirect, jsonify, request, session
 from flask_cors import CORS
-from main import get_current_playing, get_skipped_songs
+from main import get_current_playing, get_skipped_songs, refresh_skipped_songs
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from dotenv import load_dotenv
@@ -35,6 +35,11 @@ def skipped_songs():
     skipped_songs = get_skipped_songs()
 
     return jsonify({'message': skipped_songs})
+
+@app.route('/refresh_skipped')
+def refresh_skipped():
+    result = refresh_skipped_songs()
+    return jsonify({'message': result})
 
 @app.route('/login')
 def login():

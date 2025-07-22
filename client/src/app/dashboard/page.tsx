@@ -21,7 +21,7 @@ export default function Dashboard() {
   const currentPlaying = getNowPlaying();
 
   return (
-    <main className='flex items-center justify-center h-screen'>
+    <main className='flex items-center justify-center py-12'>
       <div className='flex flex-col items-center bg-green-400 rounded-lg p-6 transition-all duration-300'>
         <h1 className="text-3xl font-bold flex justify-center items-center pb-2">Currently Playing</h1>
         <p className='text-sm mb-4'><span className="underline">Username</span>: {user}</p>

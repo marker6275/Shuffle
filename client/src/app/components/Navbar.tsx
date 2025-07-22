@@ -16,7 +16,7 @@ export default function Navbar() {
 
   return (
     <nav className="w-full bg-green-500 shadow-md">
-      <div className="mx-8 px-4 py-8 flex items-center justify-between h-14">
+      <div className="md:mx-4 px-4 py-8 flex items-center justify-between h-14">
         {/* Desktop Nav */}
         <ul className="hidden md:flex space-x-4 h-14 items-center">
           {tabs.map((tab) => (
