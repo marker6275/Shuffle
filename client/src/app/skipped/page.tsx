@@ -47,9 +47,15 @@ export default function Skipped() {
         <h1 className="text-2xl font-bold">No songs skipped</h1>
       )}
       {Object.entries(skippedSongs).length > 0 && (
-        <div className="flex flex-col items-center justify-center px-8 py-4 bg-green-400 rounded-lg">
-          {/* TODO: Actually remove the songs using API */}
-          <h1 className="text-xl font-bold">Remove Songs</h1>
+        <div className="flex items-center justify-center gap-4 w-full md:w-128">
+          <div className="flex flex-col items-center justify-center py-4 px-3 bg-green-500 rounded-lg w-full">
+            {/* TODO: Actually remove the songs using API */}
+            <h1 className="text-xs md:text-xl font-bold text-white">Remove from playlist</h1>
+          </div>
+          {/* TODO: Clear all skipped songs, set strikes to 0 in json */}
+          <div className="flex flex-col items-center justify-center py-4 px-3 bg-red-500 rounded-lg w-full">
+            <h1 className="text-xs md:text-xl font-bold text-white">Clear skipped songs</h1>
+          </div>
         </div>
       )}
     </div>
