@@ -1,6 +1,6 @@
 from flask import Flask, redirect, jsonify, request, session
 from flask_cors import CORS
-from main import get_current_playing, get_skipped_songs, refresh_skipped_songs
+from main import get_current_playing, get_skipped_songs, refresh_skipped_songs, remove_strike_by_id
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from dotenv import load_dotenv
@@ -11,7 +11,7 @@ load_dotenv()
 REDIRECT_URL = os.getenv('REDIRECT_URI')
 
 app = Flask(__name__)
-CORS(app, origins=['http://localhost:3000', 'http://192.168.1.152:3000'])
+CORS(app, origins=['http://localhost:3000', 'http://192.168.1.152:3000', 'http://127.0.0.1:3000'], allow_headers=['Content-Type'])
 
 scope = "user-top-read user-read-playback-state playlist-read-private playlist-read-collaborative"
 
@@ -35,6 +35,14 @@ def skipped_songs():
     skipped_songs = get_skipped_songs()
 
     return jsonify({'message': skipped_songs})
+
+@app.route('/subtract_strike', methods=['POST'])
+def subtract_strike():
+    data = request.get_json()
+    print(data)
+    id = data['id']
+    remove_strike_by_id(id)
+    return jsonify({'message': 'Strike subtracted'})
 
 @app.route('/refresh_skipped')
 def refresh_skipped():

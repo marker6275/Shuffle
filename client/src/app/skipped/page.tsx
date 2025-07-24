@@ -7,7 +7,7 @@ import { getNowPlaying } from "../context/Polling";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 export default function Skipped() {
-  const [skippedSongs, setSkippedSongs] = useState<{ [key: string]: { name: string, artist: string, uri: string, strikes: number, image: string } }>({});
+  const [skippedSongs, setSkippedSongs] = useState<{ [id: string]: { name: string, artist: string, uri: string, strikes: number, image: string } }>({});
 
   const currentPlaying = getNowPlaying();
 
@@ -40,11 +40,17 @@ export default function Skipped() {
       {Object.entries(skippedSongs).length > 0 ? (
         Object.entries(skippedSongs)
           .sort(([, a], [, b]) => a.name.localeCompare(b.name))
-          .map(([key, value]) => (
-            <SkippedCard key={key} song={value} current={key === currentPlaying.id}/>
+          .map(([id, value]) => (
+            <SkippedCard key={id} id={id} song={value} current={id === currentPlaying.id}/>
           ))
       ) : (
         <h1 className="text-2xl font-bold">No songs skipped</h1>
+      )}
+      {Object.entries(skippedSongs).length > 0 && (
+        <div className="flex flex-col items-center justify-center px-8 py-4 bg-green-400 rounded-lg">
+          {/* TODO: Actually remove the songs using API */}
+          <h1 className="text-xl font-bold">Remove Songs</h1>
+        </div>
       )}
     </div>
   );

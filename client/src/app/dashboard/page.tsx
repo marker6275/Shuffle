@@ -25,7 +25,7 @@ export default function Dashboard() {
       <div className='flex flex-col items-center bg-green-400 rounded-lg p-6 transition-all duration-300 max-w-84 md:max-w-96'>
         <h1 className="text-3xl font-bold flex justify-center items-center mb-2">Currently Playing</h1>
         <hr className='w-full mb-2'/>
-        <div className="flex w-full justify-between">
+        <div className="flex w-full justify-between items-center">
           <p className='text-sm mb-2'><span className="underline">Username</span>: {user}</p>
           <p className='font-semibold mb-2'>{currentPlaying.status}</p>
         </div>

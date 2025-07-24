@@ -94,6 +94,12 @@ def validate_skipped_songs(skipped_songs):
         
     return skipped_songs
 
+def remove_strike_by_id(id):
+    tunes = load_tunes()
+
+    tunes[id]['strikes'] -= 1
+    write_to_tunes(tunes)
+
 def get_skipped_songs():
     global SKIPPED_SONGS
     
