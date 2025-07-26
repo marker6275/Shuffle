@@ -11,6 +11,20 @@ export default function Skipped() {
 
   const currentPlaying = getNowPlaying();
 
+  function removeFromPlaylist(): void {
+    console.log("Removing from playlist");
+  }
+
+  function clearSkippedSongs(): void {
+    console.log("Clearing skipped songs");
+    fetch(API_BASE + '/clear_skipped_songs')
+      .then(res => res.json())
+      .then(data => {
+        console.log(data.message)
+      });
+  }
+  
+
   useEffect(() => {
     fetch(API_BASE + '/refresh_skipped')
       .then(res => res.json())
@@ -48,12 +62,10 @@ export default function Skipped() {
       )}
       {Object.entries(skippedSongs).length > 0 && (
         <div className="flex items-center justify-center gap-4 w-full md:w-128">
-          <div className="flex flex-col items-center justify-center py-4 px-3 bg-green-500 rounded-lg w-full">
-            {/* TODO: Actually remove the songs using API */}
+          <div className="flex flex-col items-center justify-center py-4 px-3 bg-green-500 rounded-lg w-full cursor-pointer hover:bg-green-600" onClick={removeFromPlaylist}>
             <h1 className="text-xs md:text-xl font-bold text-white">Remove from playlist</h1>
           </div>
-          {/* TODO: Clear all skipped songs, set strikes to 0 in json */}
-          <div className="flex flex-col items-center justify-center py-4 px-3 bg-red-500 rounded-lg w-full">
+          <div className="flex flex-col items-center justify-center py-4 px-3 bg-red-500 rounded-lg w-full cursor-pointer" onClick={clearSkippedSongs}>
             <h1 className="text-xs md:text-xl font-bold text-white">Clear skipped songs</h1>
           </div>
         </div>

@@ -124,6 +124,21 @@ def refresh_skipped_songs():
     except Exception as e:
         return e
 
+def clear_skipped():
+    global SKIPPED_SONGS
+    try:
+        tunes = load_tunes()
+
+        for id in list(SKIPPED_SONGS.keys()):
+            tunes[id]['strikes'] = 0
+            del SKIPPED_SONGS[id]
+        
+        write_to_tunes(tunes)
+
+        return 1
+    except Exception as e:
+        return e
+
 def update_strikes(id, song, tunes, progress, skipped, image):
     global CURRENT_SONG, SKIPPED_SONGS
 

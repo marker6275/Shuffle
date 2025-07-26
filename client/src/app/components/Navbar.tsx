@@ -9,9 +9,9 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const tabs = [
-    { name: 'Currently Playing', href: '/dashboard' },
+    { name: 'Dashboard', href: '/dashboard' },
     { name: 'Skipped Songs', href: '/skipped' },
-    { name: 'Recommended Songs', href: '/recommended' },
+    // { name: 'Recommended Songs', href: '/recommended' },
   ];
 
   return (
