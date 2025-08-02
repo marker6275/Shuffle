@@ -44,7 +44,6 @@ def clear_skipped_songs():
 @app.route('/subtract_strike', methods=['POST'])
 def subtract_strike():
     data = request.get_json()
-    print(data)
     id = data['id']
     remove_strike_by_id(id)
     return jsonify({'message': 'Strike subtracted'})
@@ -72,6 +71,12 @@ def callback():
     user = sp.current_user()
 
     return redirect(f"http://192.168.1.152:3000/dashboard?user={user['display_name']}")
+
+@app.route('/queue')
+def queue():
+    queue = sp.queue()
+    print("QUEUE", queue)
+    return jsonify({'message': queue})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
