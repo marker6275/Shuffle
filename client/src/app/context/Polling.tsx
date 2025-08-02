@@ -16,61 +16,75 @@ const NowPlayingContext = createContext({
   artists: "",
   image: "",
   status: playingStatus.NOT_PLAYING,
+  queue: {},
 });
 
-function setSong(data: any, setCurrentPlaying: any) {
-  if (data.message) {
-    const song = data.message;
-    const status = data.playing_status;
-    setCurrentPlaying({
-      id: song.id,
-      name: song.name,
-      artists: song.artists[0].name,
-      image: song.album.images[1].url,
+function updatePollData(songData: any, setPollData: any) {
+  setPollData((prev: any) => {
+    const song = songData.message;
+    const status = songData.playing_status;
+    return {
+      ...prev,
+      id: song ? song.id : "",
+      name: song ? song.name : "",
+      artists: song ? song.artists[0].name : "",
+      image: song ? song.album.images[1].url : "",
       status: playingStatus[status],
-    });
-  } else {
-    const status = data.playing_status;
-    setCurrentPlaying({
-      id: "",
-      name: "",
-      artists: "",
-      image: "",
-      status: playingStatus[status],
-    });
-  }
+    };
+  });
 }
 
 export function NowPlayingProvider({ children }: { children: any }) {
-  const [currentPlaying, setCurrentPlaying] = useState({
+  const [pollData, setPollData] = useState({
     id: "",
     name: "",
     artists: "",
     image: "",
     status: playingStatus.NOT_PLAYING,
+    queue: {},
   });
+
+  const [intervalTime, setIntervalTime] = useState(10000);
 
   useEffect(() => {
     const fetchNowPlaying = () => {
       fetch(API_BASE + "/current_playing")
         .then((res) => res.json())
         .then((data) => {
-          setSong(data, setCurrentPlaying);
+          updatePollData(data, setPollData);
+          setIntervalTime(
+            data.playing_status === playingStatus.NOT_PLAYING ? 10000 : 5000
+          );
         });
     };
 
     fetchNowPlaying();
 
-    // Use different intervals based on playing status
-    const intervalTime =
-      currentPlaying.status === playingStatus.NOT_PLAYING ? 10000 : 5000;
     const interval = setInterval(fetchNowPlaying, intervalTime);
 
-    return () => clearInterval(interval);
-  }, [currentPlaying.status]); // Re-run when status changes
+    return () => {
+      clearInterval(interval);
+    };
+  }, [intervalTime]);
+
+  useEffect(() => {
+    const fetchQueue = () => {
+      console.log("fetching queue");
+      fetch(API_BASE + "/queue")
+        .then((res) => res.json())
+        .then((data) => {
+          setPollData((prev) => ({
+            ...prev,
+            queue: data.message,
+          }));
+        });
+    };
+
+    fetchQueue();
+  }, [pollData.id]);
 
   return (
-    <NowPlayingContext.Provider value={currentPlaying}>
+    <NowPlayingContext.Provider value={pollData}>
       {children}
     </NowPlayingContext.Provider>
   );

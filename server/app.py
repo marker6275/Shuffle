@@ -73,5 +73,10 @@ def callback():
 
     return redirect(f"http://192.168.1.152:3000/dashboard?user={user['display_name']}")
 
+@app.route('/queue')
+def queue():
+    queue = sp.queue()
+    return jsonify({'message': queue})
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
