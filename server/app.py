@@ -11,7 +11,7 @@ load_dotenv()
 REDIRECT_URL = os.getenv('REDIRECT_URI')
 
 app = Flask(__name__)
-CORS(app, origins=['http://localhost:3000', 'http://192.168.1.152:3000', 'http://127.0.0.1:3000'], allow_headers=['Content-Type'])
+CORS(app, origins=['http://localhost:3000', 'http://192.168.1.71:3000', 'http://127.0.0.1:3000'], allow_headers=['Content-Type'])
 
 scope = "user-top-read user-read-playback-state playlist-read-private playlist-read-collaborative"
 
@@ -71,7 +71,9 @@ def callback():
 
     user = sp.current_user()
 
-    return redirect(f"http://192.168.1.152:3000/dashboard?user={user['display_name']}")
+    get_songs_from_tunes(sp)
+
+    return redirect(f"http://192.168.1.71:3000/dashboard?user={user['display_name']}")
 
 @app.route('/queue')
 def queue():
